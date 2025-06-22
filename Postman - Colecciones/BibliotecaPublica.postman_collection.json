@@ -1,0 +1,438 @@
+{
+	"info": {
+		"_postman_id": "397acca2-b68d-4ffd-b2d6-55816f7b5e03",
+		"name": "BibliotecaPublica",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "24448238"
+	},
+	"item": [
+		{
+			"name": "Libro",
+			"item": [
+				{
+					"name": "Filtrados",
+					"item": [
+						{
+							"name": "ORDENAMIENTO ESPECÍFICO",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/libros?sortBy=anioPublicacion&sortDirection=DESC&page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"libros"
+									],
+									"query": [
+										{
+											"key": "sortBy",
+											"value": "anioPublicacion"
+										},
+										{
+											"key": "sortDirection",
+											"value": "DESC"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "LIBROS CON CANTIDAD MÍNIMA",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/libros?cantidadDisponible=5&page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"libros"
+									],
+									"query": [
+										{
+											"key": "cantidadDisponible",
+											"value": "5"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BÚSQUEDA GENERAL",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/libros?search=García&page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"libros"
+									],
+									"query": [
+										{
+											"key": "search",
+											"value": "García"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BUSCAR POR MÚLTIPLES CRITERIOS",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/libros?autor=García&anioPublicacion=1967&page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"libros"
+									],
+									"query": [
+										{
+											"key": "autor",
+											"value": "García"
+										},
+										{
+											"key": "anioPublicacion",
+											"value": "1967"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BUSCAR POR CÓDIGO EXACTO",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/libros?codigoLibro=LIB001",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"libros"
+									],
+									"query": [
+										{
+											"key": "codigoLibro",
+											"value": "LIB001"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BUSCAR POR TÍTULO",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/libros?titulo=Especial&page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"libros"
+									],
+									"query": [
+										{
+											"key": "titulo",
+											"value": "Especial"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BUSCAR POR AUTOR",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/libros?autor=García&page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"libros"
+									],
+									"query": [
+										{
+											"key": "autor",
+											"value": "García"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "COMBINACIÓN COMPLEJA",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/libros?autor=García&disponible=true&cantidadDisponible=2&sortBy=titulo&sortDirection=ASC&page=0&size=5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"libros"
+									],
+									"query": [
+										{
+											"key": "autor",
+											"value": "García"
+										},
+										{
+											"key": "disponible",
+											"value": "true"
+										},
+										{
+											"key": "cantidadDisponible",
+											"value": "2"
+										},
+										{
+											"key": "sortBy",
+											"value": "titulo"
+										},
+										{
+											"key": "sortDirection",
+											"value": "ASC"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "OBTENER POR ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": "http://localhost:8081/api/libros/1"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "CREAR NUEVO LIBRO",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"codigoLibro\": \"LIB011\",\r\n  \"titulo\": \"El laberinto de la soledad\",\r\n  \"autor\": \"Octavio Paz\",\r\n  \"editorial\": \"Fondo de Cultura Económica\",\r\n  \"anioPublicacion\": 1950,\r\n  \"cantidadDisponible\": 3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8081/api/libros"
+					},
+					"response": []
+				},
+				{
+					"name": "ACTUALIZAR LIBRO",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"codigoLibro\": \"LIB001\",\r\n  \"titulo\": \"Cien años de soledad (Especial)\",\r\n  \"autor\": \"Gabriel García Márquez\",\r\n  \"editorial\": \"Sudamericana\",\r\n  \"anioPublicacion\": 1967,\r\n  \"cantidadDisponible\": 8\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8081/api/libros/1"
+					},
+					"response": []
+				},
+				{
+					"name": "ELIMINAR LIBRO",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://localhost:8081/api/libros/12"
+					},
+					"response": []
+				},
+				{
+					"name": "OBTENER LIBROS DISPONIBLES",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/libros?disponible=true&page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"libros"
+							],
+							"query": [
+								{
+									"key": "disponible",
+									"value": "true"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "OBTENER TODOS LOS LIBROS",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/libros?page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"libros"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
