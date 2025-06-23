@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Libros - Biblioteca</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .search-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .card-hover {
+            transition: transform 0.2s ease-in-out;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .btn-action {
+            margin: 0 2px;
+        }
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .pagination-container {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/web/libros">
+            <i class="fas fa-book"></i> Biblioteca Digital
+        </a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/web/libros/nuevo">
+                <i class="fas fa-plus"></i> Nuevo Libro
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- Sección de Búsqueda -->
+<div class="search-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-4">
+                    <i class="fas fa-search"></i> Gestión de Libros
+                </h1>
+                <form method="get" th:action="@{/web/libros}" class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="search" placeholder="Búsqueda general..."
+                               th:value="${search}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="titulo" placeholder="Título"
+                               th:value="${param.titulo}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="autor" placeholder="Autor"
+                               th:value="${param.autor}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="codigoLibro" placeholder="Código"
+                               th:value="${param.codigoLibro}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" name="anioPublicacion" placeholder="Año"
+                               th:value="${param.anioPublicacion}">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-light w-100">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <input type="hidden" name="page" th:value="${currentPage}">
+                    <input type="hidden" name="sortBy" th:value="${sortBy}">
+                    <input type="hidden" name="sortDirection" th:value="${sortDirection}">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Mensajes de éxito/error -->
+    <div th:if="${mensaje}" class="alert alert-dismissible fade show"
+         th:classappend="${tipoMensaje == 'success'} ? 'alert-success' : 'alert-danger'">
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Tabla de Libros -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                <tr>
+                    <th>
+                        <a th:href="@{/web/libros(page=${currentPage}, sortBy='codigoLibro', sortDirection=${sortBy == 'codigoLibro' and sortDirection == 'ASC'} ? 'DESC' : 'ASC', search=${search})}"
+                           class="text-white text-decoration-none">
+                            Código
+                            <i th:if="${sortBy == 'codigoLibro'}"
+                               th:class="${sortDirection == 'ASC'} ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a th:href="@{/web/libros(page=${currentPage}, sortBy='titulo', sortDirection=${sortBy == 'titulo' and sortDirection == 'ASC'} ? 'DESC' : 'ASC', search=${search})}"
+                           class="text-white text-decoration-none">
+                            Título
+                            <i th:if="${sortBy == 'titulo'}"
+                               th:class="${sortDirection == 'ASC'} ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a th:href="@{/web/libros(page=${currentPage}, sortBy='autor', sortDirection=${sortBy == 'autor' and sortDirection == 'ASC'} ? 'DESC' : 'ASC', search=${search})}"
+                           class="text-white text-decoration-none">
+                            Autor
+                            <i th:if="${sortBy == 'autor'}"
+                               th:class="${sortDirection == 'ASC'} ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                        </a>
+                    </th>
+                    <th>Editorial</th>
+                    <th>
+                        <a th:href="@{/web/libros(page=${currentPage}, sortBy='anioPublicacion', sortDirection=${sortBy == 'anioPublicacion' and sortDirection == 'ASC'} ? 'DESC' : 'ASC', search=${search})}"
+                           class="text-white text-decoration-none">
+                            Año
+                            <i th:if="${sortBy == 'anioPublicacion'}"
+                               th:class="${sortDirection == 'ASC'} ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                        </a>
+                    </th>
+                    <th>Disponible</th>
+                    <th width="200">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="libro : ${libros.content}">
+                    <td>
+                        <strong th:text="${libro.codigoLibro}" class="text-primary"></strong>
+                    </td>
+                    <td th:text="${libro.titulo}"></td>
+                    <td th:text="${libro.autor}"></td>
+                    <td th:text="${libro.editorial}"></td>
+                    <td th:text="${libro.anioPublicacion}"></td>
+                    <td>
+                                <span th:if="${libro.cantidadDisponible > 0}" class="badge bg-success">
+                                    <i class="fas fa-check"></i> [[${libro.cantidadDisponible}]]
+                                </span>
+                        <span th:if="${libro.cantidadDisponible == 0}" class="badge bg-danger">
+                                    <i class="fas fa-times"></i> Agotado
+                                </span>
+                    </td>
+                    <td>
+                        <a th:href="@{/web/libros/detalle/{id}(id=${libro.id})}"
+                           class="btn btn-info btn-sm btn-action" title="Ver detalles">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a th:href="@{/web/libros/editar/{id}(id=${libro.id})}"
+                           class="btn btn-warning btn-sm btn-action" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button type="button" class="btn btn-danger btn-sm btn-action btn-eliminar"
+                                title="Eliminar"
+                                th:data-libro-id="${libro.id}"
+                                th:data-libro-titulo="${libro.titulo}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(libros.content)}">
+                    <td colspan="7" class="text-center py-4">
+                        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No se encontraron libros</h5>
+                        <p class="text-muted">Intenta ajustar los filtros de búsqueda</p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination-container" th:if="${libros.totalPages > 1}">
+        <nav aria-label="Paginación de libros">
+            <ul class="pagination justify-content-center mb-0">
+                <!-- Anterior -->
+                <li class="page-item" th:classappend="${libros.first} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/web/libros(page=${libros.page - 1}, sortBy=${sortBy}, sortDirection=${sortDirection}, search=${search})}">
+                        <i class="fas fa-chevron-left"></i> Anterior
+                    </a>
+                </li>
+
+                <!-- Números de página -->
+                <li th:each="pageNum : ${#numbers.sequence(0, libros.totalPages - 1)}"
+                    class="page-item" th:classappend="${pageNum == libros.page} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/web/libros(page=${pageNum}, sortBy=${sortBy}, sortDirection=${sortDirection}, search=${search})}"
+                       th:text="${pageNum + 1}">1</a>
+                </li>
+
+                <!-- Siguiente -->
+                <li class="page-item" th:classappend="${libros.last} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/web/libros(page=${libros.page + 1}, sortBy=${sortBy}, sortDirection=${sortDirection}, search=${search})}">
+                        Siguiente <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Botón flotante para agregar -->
+    <a href="/web/libros/nuevo" class="btn btn-primary btn-lg position-fixed"
+       style="bottom: 2rem; right: 2rem; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-plus fa-lg"></i>
+    </a>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar el libro:</p>
+                <strong id="tituloLibroEliminar"></strong>
+                <p class="mt-2 text-danger">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Manejo de eliminación con event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        const botonesEliminar = document.querySelectorAll('.btn-eliminar');
+
+        botonesEliminar.forEach(function(boton) {
+            boton.addEventListener('click', function() {
+                const id = this.getAttribute('data-libro-id');
+                const titulo = this.getAttribute('data-libro-titulo');
+                confirmarEliminacion(id, titulo);
+            });
+        });
+    });
+
+    function confirmarEliminacion(id, titulo) {
+        document.getElementById('tituloLibroEliminar').textContent = titulo;
+        document.getElementById('formEliminar').action = `/web/libros/eliminar/${id}`;
+        new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+    }
+
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+</script>
+</body>
+</html>
