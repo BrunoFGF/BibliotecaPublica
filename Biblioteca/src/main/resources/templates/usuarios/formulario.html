@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${action == 'crear'} ? 'Crear Usuario' : 'Editar Usuario'">Formulario Usuario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px 15px 0 0;
+            margin: -2rem -2rem 2rem -2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .required {
+            color: #dc3545;
+        }
+        .btn-back {
+            background: #6c757d;
+            border: none;
+        }
+        .btn-back:hover {
+            background: #5a6268;
+        }
+        .role-checkbox {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/web/libros">
+            <i class="fas fa-book"></i> Biblioteca Digital
+        </a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/web/usuarios">
+                <i class="fas fa-users"></i> Ver Todos los Usuarios
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="form-container">
+                <div class="form-header text-center">
+                    <h2>
+                        <i th:class="${action == 'crear'} ? 'fas fa-user-plus' : 'fas fa-user-edit'"></i>
+                        <span th:text="${action == 'crear'} ? 'Crear Nuevo Usuario' : 'Editar Usuario'"></span>
+                    </h2>
+                    <p class="mb-0">Complete todos los campos requeridos</p>
+                    <div th:if="${action == 'editar'}" class="mt-2">
+                        <small>Email: <span th:text="${usuarioEmail}" class="fw-bold"></span></small>
+                    </div>
+                </div>
+
+                <form th:action="@{${action == 'crear' ? '/web/usuarios/crear' : '/web/usuarios/actualizar/' + usuarioId}}"
+                      th:object="${usuario}" method="post" novalidate>
+
+            <!-- Cédula -->
+            <div class="form-group">
+                <label for="cedula" class="form-label">
+                    <i class="fas fa-id-card"></i> Cédula <span class="required">*</span>
+                </label>
+                <input type="text"
+                       class="form-control"
+                       th:class="${#fields.hasErrors('cedula')} ? 'form-control is-invalid' : 'form-control'"
+                       id="cedula"
+                       th:field="*{cedula}"
+                       placeholder="1234567890"
+                       maxlength="10"
+                       pattern="[0-9]{10}"
+                       required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('cedula')}" th:errors="*{cedula}"></div>
+                <div class="form-text">Exactamente 10 dígitos</div>
+            </div>
+
+            <!-- Nombre -->
+            <label for="nombre" class="form-label">
+                <i class="fas fa-user"></i> Nombre <span class="required">*</span>
+            </label>
+            <input type="text"
+                   class="form-control"
+                   th:class="${#fields.hasErrors('nombre')} ? 'form-control is-invalid' : 'form-control'"
+                   id="nombre"
+                   th:field="*{nombre}"
+                   placeholder="Nombre del usuario"
+                   maxlength="100"
+                   required>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+
+            <!-- Email (solo en creación) -->
+            <div class="form-group" th:if="${action == 'crear'}">
+                <label for="email" class="form-label">
+                    <i class="fas fa-envelope"></i> Email <span class="required">*</span>
+                </label>
+                <input type="email"
+                       class="form-control"
+                       th:class="${#fields.hasErrors('email')} ? 'form-control is-invalid' : 'form-control'"
+                       id="email"
+                       th:field="*{email}"
+                       placeholder="correo@ejemplo.com"
+                       maxlength="150"
+                       required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            </div>
+
+            <!-- Contraseña (solo en creación) -->
+            <div class="form-group" th:if="${action == 'crear'}">
+                <label for="password" class="form-label">
+                    <i class="fas fa-lock"></i> Contraseña <span class="required">*</span>
+                </label>
+                <input type="password"
+                       class="form-control"
+                       th:class="${#fields.hasErrors('password')} ? 'form-control is-invalid' : 'form-control'"
+                       id="password"
+                       th:field="*{password}"
+                       placeholder="Mínimo 6 caracteres"
+                       minlength="6"
+                       required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                <div class="form-text">La contraseña debe tener al menos 6 caracteres</div>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="form-group">
+                <label for="telefono" class="form-label">
+                    <i class="fas fa-phone"></i> Teléfono
+                </label>
+                <input type="tel"
+                       class="form-control"
+                       th:class="${#fields.hasErrors('telefono')} ? 'form-control is-invalid' : 'form-control'"
+                       id="telefono"
+                       th:field="*{telefono}"
+                       placeholder="0999999999"
+                       maxlength="10"
+                       pattern="[0-9]{10}">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></div>
+                <div class="form-text">10 dígitos, ejemplo: 0999999999</div>
+            </div>
+
+            <!-- Dirección -->
+            <div class="form-group">
+                <label for="direccion" class="form-label">
+                    <i class="fas fa-map-marker-alt"></i> Dirección
+                </label>
+                <textarea class="form-control"
+                          th:class="${#fields.hasErrors('direccion')} ? 'form-control is-invalid' : 'form-control'"
+                          id="direccion"
+                          th:field="*{direccion}"
+                          placeholder="Dirección del usuario"
+                          maxlength="60"
+                          rows="2"></textarea>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}"></div>
+                <div class="form-text">Máximo 60 caracteres</div>
+            </div>
+
+            <!-- Estado Activo -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-toggle-on"></i> Estado del Usuario <span class="required">*</span>
+                </label>
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="activo"
+                           th:field="*{activo}">
+                    <label class="form-check-label" for="activo">
+                        Usuario activo (puede iniciar sesión)
+                    </label>
+                </div>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('activo')}" th:errors="*{activo}"></div>
+            </div>
+
+            <!-- Roles -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-user-tag"></i> Roles <span class="required">*</span>
+                </label>
+                <div class="card">
+                    <div class="card-body">
+                        <div th:each="rol : ${roles}" class="role-checkbox">
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       th:id="'rol_' + ${rol.id}"
+                                       th:value="${rol.id}"
+                                       name="rolesIds"
+                                       th:checked="${usuario.rolesIds != null and usuario.rolesIds.contains(rol.id)}">
+                                <label class="form-check-label" th:for="'rol_' + ${rol.id}">
+                                    <strong th:text="${rol.nombre}"></strong>
+                                    <br>
+                                    <small class="text-muted" th:text="${rol.descripcion}"></small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('rolesIds')}" th:errors="*{rolesIds}"></div>
+                <div class="form-text">Debe seleccionar al menos un rol</div>
+            </div>
+
+            <!-- Botones -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                <a href="/web/usuarios" class="btn btn-secondary btn-back me-md-2">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i th:class="${action == 'crear'} ? 'fas fa-save' : 'fas fa-edit'"></i>
+                    <span th:text="${action == 'crear'} ? 'Crear Usuario' : 'Actualizar Usuario'"></span>
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Validación en tiempo real
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const inputs = form.querySelectorAll('input[required], textarea[required]');
+
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                validateField(this);
+            });
+
+            input.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid')) {
+                    validateField(this);
+                }
+            });
+        });
+
+        function validateField(field) {
+            const isValid = field.checkValidity();
+            field.classList.toggle('is-valid', isValid);
+            field.classList.toggle('is-invalid', !isValid);
+        }
+
+        // Validación de roles
+        const roleCheckboxes = document.querySelectorAll('input[name="rolesIds"]');
+        const validateRoles = () => {
+            const checkedRoles = document.querySelectorAll('input[name="rolesIds"]:checked');
+            const roleContainer = document.querySelector('.card');
+
+            if (checkedRoles.length === 0) {
+                roleContainer.classList.add('border-danger');
+            } else {
+                roleContainer.classList.remove('border-danger');
+            }
+        };
+
+        roleCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', validateRoles);
+        });
+
+        // Validar al enviar formulario
+        form.addEventListener('submit', function(e) {
+            const checkedRoles = document.querySelectorAll('input[name="rolesIds"]:checked');
+            if (checkedRoles.length === 0) {
+                e.preventDefault();
+                alert('Debe seleccionar al menos un rol para el usuario');
+                return false;
+            }
+        });
+    });
+</script>
+</body>
+</html>

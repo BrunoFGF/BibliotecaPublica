@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - Biblioteca</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .search-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .btn-action {
+            margin: 0 2px;
+        }
+        .pagination-container {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/web/libros">
+            <i class="fas fa-book"></i> Biblioteca Digital
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="/web/libros">
+                    <i class="fas fa-book-open"></i> Libros
+                </a>
+                <a class="nav-link" href="/web/usuarios">
+                    <i class="fas fa-users"></i> Usuarios
+                </a>
+            </div>
+            <div class="navbar-nav">
+                <span class="navbar-text me-3" sec:authentication="name"></span>
+                <a class="nav-link" href="/logout">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Sección de Búsqueda -->
+<div class="search-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-4">
+                    <i class="fas fa-users"></i> Gestión de Usuarios
+                </h1>
+                <form method="get" th:action="@{/web/usuarios}" class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="search" placeholder="Búsqueda general..."
+                               th:value="${search}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="nombre" placeholder="Nombre"
+                               th:value="${param.nombre}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="cedula" placeholder="Cédula"
+                               th:value="${param.cedula}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="email" class="form-control" name="email" placeholder="Email"
+                               th:value="${param.email}">
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="rol">
+                            <option value="">Todos los roles</option>
+                            <option th:each="rol : ${roles}"
+                                    th:value="${rol.nombre}"
+                                    th:text="${rol.descripcion}"
+                                    th:selected="${param.rol != null and param.rol[0] == rol.nombre}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-light w-100">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Mensajes -->
+    <div th:if="${mensaje}" class="alert alert-dismissible fade show"
+         th:classappend="${tipoMensaje == 'success'} ? 'alert-success' : 'alert-danger'">
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Botón para nuevo usuario -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Usuarios Registrados</h3>
+        <a href="/web/usuarios/nuevo" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nuevo Usuario
+        </a>
+    </div>
+
+    <!-- Tabla de Usuarios -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                <tr>
+                    <th>
+                        <a th:href="@{/web/usuarios(page=${currentPage}, sortBy='nombre', sortDirection=${sortBy == 'nombre' and sortDirection == 'ASC'} ? 'DESC' : 'ASC', search=${search})}"
+                           class="text-white text-decoration-none">
+                            Nombre
+                            <i th:if="${sortBy == 'nombre'}"
+                               th:class="${sortDirection == 'ASC'} ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a th:href="@{/web/usuarios(page=${currentPage}, sortBy='cedula', sortDirection=${sortBy == 'cedula' and sortDirection == 'ASC'} ? 'DESC' : 'ASC', search=${search})}"
+                           class="text-white text-decoration-none">
+                            Cédula
+                            <i th:if="${sortBy == 'cedula'}"
+                               th:class="${sortDirection == 'ASC'} ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a th:href="@{/web/usuarios(page=${currentPage}, sortBy='email', sortDirection=${sortBy == 'email' and sortDirection == 'ASC'} ? 'DESC' : 'ASC', search=${search})}"
+                           class="text-white text-decoration-none">
+                            Email
+                            <i th:if="${sortBy == 'email'}"
+                               th:class="${sortDirection == 'ASC'} ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                        </a>
+                    </th>
+                    <th>Roles</th>
+                    <th>Estado</th>
+                    <th width="200">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="usuario : ${usuarios.content}">
+                    <td>
+                        <div>
+                            <strong th:text="${usuario.nombre}"></strong><br>
+                            <small class="text-muted" th:text="${usuario.telefono}"></small>
+                        </div>
+                    </td>
+                    <td>
+                        <span th:text="${usuario.cedula}" class="badge bg-light text-dark"></span>
+                    </td>
+                    <td th:text="${usuario.email}"></td>
+                    <td>
+                        <span th:each="rol : ${usuario.roles}"
+                              class="badge me-1"
+                              th:classappend="${rol.nombre == 'BIBLIOTECARIO'} ? 'bg-primary' : 'bg-secondary'"
+                              th:text="${rol.nombre}">
+                        </span>
+                    </td>
+                    <td>
+                        <span th:if="${usuario.activo}" class="badge bg-success status-badge">
+                            <i class="fas fa-check"></i> Activo
+                        </span>
+                        <span th:if="${!usuario.activo}" class="badge bg-danger status-badge">
+                            <i class="fas fa-times"></i> Inactivo
+                        </span>
+                    </td>
+                    <td>
+                        <a th:href="@{/web/usuarios/detalle/{id}(id=${usuario.id})}"
+                           class="btn btn-info btn-sm btn-action" title="Ver detalles">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a th:href="@{/web/usuarios/editar/{id}(id=${usuario.id})}"
+                           class="btn btn-warning btn-sm btn-action" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button type="button" class="btn btn-danger btn-sm btn-action btn-eliminar"
+                                title="Eliminar"
+                                th:data-usuario-id="${usuario.id}"
+                                th:data-usuario-nombre="${usuario.nombre}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(usuarios.content)}">
+                    <td colspan="5" class="text-center py-4">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No se encontraron usuarios</h5>
+                        <p class="text-muted">Intenta ajustar los filtros de búsqueda</p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination-container" th:if="${usuarios.totalPages > 1}">
+        <nav aria-label="Paginación de usuarios">
+            <ul class="pagination justify-content-center mb-0">
+                <!-- Anterior -->
+                <li class="page-item" th:classappend="${usuarios.first} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/web/usuarios(page=${usuarios.page - 1}, sortBy=${sortBy}, sortDirection=${sortDirection}, search=${search})}">
+                        <i class="fas fa-chevron-left"></i> Anterior
+                    </a>
+                </li>
+
+                <!-- Números de página -->
+                <li th:each="pageNum : ${#numbers.sequence(0, usuarios.totalPages - 1)}"
+                    class="page-item" th:classappend="${pageNum == usuarios.page} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/web/usuarios(page=${pageNum}, sortBy=${sortBy}, sortDirection=${sortDirection}, search=${search})}"
+                       th:text="${pageNum + 1}">1</a>
+                </li>
+
+                <!-- Siguiente -->
+                <li class="page-item" th:classappend="${usuarios.last} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/web/usuarios(page=${usuarios.page + 1}, sortBy=${sortBy}, sortDirection=${sortDirection}, search=${search})}">
+                        Siguiente <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar al usuario:</p>
+                <strong id="nombreUsuarioEliminar"></strong>
+                <p class="mt-2 text-danger">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Manejo de eliminación
+    document.addEventListener('DOMContentLoaded', function() {
+        const botonesEliminar = document.querySelectorAll('.btn-eliminar');
+
+        botonesEliminar.forEach(function(boton) {
+            boton.addEventListener('click', function() {
+                const id = this.getAttribute('data-usuario-id');
+                const nombre = this.getAttribute('data-usuario-nombre');
+                confirmarEliminacion(id, nombre);
+            });
+        });
+    });
+
+    function confirmarEliminacion(id, nombre) {
+        document.getElementById('nombreUsuarioEliminar').textContent = nombre;
+        document.getElementById('formEliminar').action = `/web/usuarios/eliminar/${id}`;
+        new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+    }
+
+    // Auto-hide alerts
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+</script>
+</body>
+</html>
