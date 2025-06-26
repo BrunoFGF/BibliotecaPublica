@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -77,12 +78,28 @@ public class Usuario implements UserDetails {
     )
     private Set<Rol> roles;
 
-    // Métodos de UserDetails
+    // Métodos de UserDetails con manejo de errores
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(rol -> new SimpleGrantedAuthority("ROLE_" + rol.getNombre()))
-                .collect(Collectors.toList());
+        try {
+            if (roles == null || roles.isEmpty()) {
+                System.out.println("WARNING: Usuario " + email + " no tiene roles asignados");
+                return Collections.emptyList();
+            }
+
+            return roles.stream()
+                    .filter(rol -> rol != null && rol.getNombre() != null)
+                    .map(rol -> {
+                        String authority = "ROLE_" + rol.getNombre();
+                        System.out.println("Creando authority: " + authority);
+                        return new SimpleGrantedAuthority(authority);
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.out.println("ERROR en getAuthorities(): " + e.getMessage());
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
     }
 
     @Override
@@ -97,7 +114,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return activo;
+        return activo != null ? activo : false;
     }
 
     @Override
@@ -107,17 +124,24 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return activo && emailVerificado;
+        boolean activoCheck = activo != null ? activo : false;
+        boolean emailCheck = emailVerificado != null ? emailVerificado : false;
+        System.out.println("isEnabled() - activo: " + activoCheck + ", emailVerificado: " + emailCheck);
+        return activoCheck && emailCheck;
     }
 
-    // Métodos de utilidad
+    // Métodos de utilidad con validación null-safe
     public String getNombreCompleto() {
-        return nombre;
+        return nombre != null ? nombre : "";
     }
 
     public boolean tieneRol(String nombreRol) {
+        if (roles == null || nombreRol == null) {
+            return false;
+        }
         return roles.stream()
-                .anyMatch(rol -> rol.getNombre().equals(nombreRol));
+                .filter(rol -> rol != null)
+                .anyMatch(rol -> nombreRol.equals(rol.getNombre()));
     }
 
     public boolean esBibliotecario() {

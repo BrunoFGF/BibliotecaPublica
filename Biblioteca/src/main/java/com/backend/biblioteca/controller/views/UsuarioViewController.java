@@ -1,5 +1,6 @@
 package com.backend.biblioteca.controller.views;
 
+import com.backend.biblioteca.dto.request.ChangePasswordRequest;
 import com.backend.biblioteca.dto.request.UsuarioCreateRequest;
 import com.backend.biblioteca.dto.request.UsuarioUpdateRequest;
 import com.backend.biblioteca.dto.response.UsuarioResponse;
@@ -95,6 +96,35 @@ public class UsuarioViewController {
         return "redirect:/web/usuarios";
     }
 
+    // Eliminar usuario
+    @PostMapping("/eliminar/{id}")
+    public String eliminarUsuario(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            usuarioService.deleteUsuario(id);
+            redirectAttributes.addFlashAttribute("mensaje", "Usuario eliminado exitosamente");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "success");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensaje", "Error: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("tipoMensaje", "error");
+        }
+
+        return "redirect:/web/usuarios";
+    }
+
+    // Ver detalles del usuario
+    @GetMapping("/detalle/{id}")
+    public String verDetalle(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            UsuarioResponse usuario = usuarioService.getUsuarioById(id);
+            model.addAttribute("usuario", usuario);
+            return "usuarios/detalle";
+        } catch (ResourceNotFoundException e) {
+            redirectAttributes.addFlashAttribute("mensaje", "Usuario no encontrado");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "error");
+            return "redirect:/web/usuarios";
+        }
+    }
+
     // Formulario para editar usuario
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
@@ -144,6 +174,7 @@ public class UsuarioViewController {
             return "usuarios/formulario";
         }
 
+
         try {
             usuarioService.updateUsuario(id, usuario);
             redirectAttributes.addFlashAttribute("mensaje", "Usuario actualizado exitosamente");
@@ -156,12 +187,26 @@ public class UsuarioViewController {
         return "redirect:/web/usuarios";
     }
 
-    // Eliminar usuario
-    @PostMapping("/eliminar/{id}")
-    public String eliminarUsuario(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    // En el controlador
+    @GetMapping("/cambiar-password/{id}")
+    public String mostrarFormularioCambiarPassword(@PathVariable Long id, Model model) {
+        model.addAttribute("usuarioId", id);
+        model.addAttribute("changePasswordRequest", new ChangePasswordRequest());
+        return "usuarios/cambiar-password";
+    }
+
+    @PostMapping("/cambiar-password/{id}")
+    public String cambiarPassword(@PathVariable Long id,
+                                  @Valid @ModelAttribute ChangePasswordRequest request,
+                                  BindingResult result, RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            // manejar errores
+            return "usuarios/cambiar-password";
+        }
+
         try {
-            usuarioService.deleteUsuario(id);
-            redirectAttributes.addFlashAttribute("mensaje", "Usuario eliminado exitosamente");
+            usuarioService.changePassword(id, request);
+            redirectAttributes.addFlashAttribute("mensaje", "Contraseña cambiada exitosamente");
             redirectAttributes.addFlashAttribute("tipoMensaje", "success");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensaje", "Error: " + e.getMessage());
@@ -169,19 +214,5 @@ public class UsuarioViewController {
         }
 
         return "redirect:/web/usuarios";
-    }
-
-    // Ver detalles del usuario
-    @GetMapping("/detalle/{id}")
-    public String verDetalle(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
-        try {
-            UsuarioResponse usuario = usuarioService.getUsuarioById(id);
-            model.addAttribute("usuario", usuario);
-            return "usuarios/detalle";
-        } catch (ResourceNotFoundException e) {
-            redirectAttributes.addFlashAttribute("mensaje", "Usuario no encontrado");
-            redirectAttributes.addFlashAttribute("tipoMensaje", "error");
-            return "redirect:/web/usuarios";
-        }
     }
 }
