@@ -19,7 +19,6 @@ public class LibroViewController {
     @Autowired
     private LibroService libroService;
 
-    // Página principal - Lista de libros
     @GetMapping
     public String listarLibros(
             @RequestParam(defaultValue = "0") int page,
@@ -49,7 +48,6 @@ public class LibroViewController {
         return "libros/lista";
     }
 
-    // Formulario para crear libro
     @GetMapping("/nuevo")
     public String mostrarFormularioCrear(Model model) {
         model.addAttribute("libro", new LibroCreateRequest());
@@ -57,7 +55,6 @@ public class LibroViewController {
         return "libros/formulario";
     }
 
-    // Crear libro
     @PostMapping("/crear")
     public String crearLibro(@Valid @ModelAttribute("libro") LibroCreateRequest libro,
                              BindingResult result, Model model, RedirectAttributes redirectAttributes) {
@@ -78,7 +75,6 @@ public class LibroViewController {
         return "redirect:/web/libros";
     }
 
-    // Formulario para editar libro
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
@@ -102,7 +98,6 @@ public class LibroViewController {
         }
     }
 
-    // Actualizar libro
     @PostMapping("/actualizar/{id}")
     public String actualizarLibro(@PathVariable Long id,
                                   @Valid @ModelAttribute("libro") LibroCreateRequest libro,
@@ -125,7 +120,6 @@ public class LibroViewController {
         return "redirect:/web/libros";
     }
 
-    // Eliminar libro
     @PostMapping("/eliminar/{id}")
     public String eliminarLibro(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
@@ -140,7 +134,6 @@ public class LibroViewController {
         return "redirect:/web/libros";
     }
 
-    // Ver detalles del libro
     @GetMapping("/detalle/{id}")
     public String verDetalle(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {

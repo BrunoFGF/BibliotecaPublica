@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -25,7 +25,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return NoOpPasswordEncoder.getInstance();
     }
 
     @Bean
@@ -47,19 +47,10 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Rutas públicas
                         .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-
-                        // API REST - Solo bibliotecarios pueden hacer login via API
                         .requestMatchers("/api/auth/login").permitAll()
-
-                        // Todas las rutas web requieren rol BIBLIOTECARIO
                         .requestMatchers("/web/**").hasRole("BIBLIOTECARIO")
-
-                        // API REST - Solo bibliotecarios
                         .requestMatchers("/api/**").hasRole("BIBLIOTECARIO")
-
-                        // Todas las demás rutas requieren autenticación como bibliotecario
                         .anyRequest().hasRole("BIBLIOTECARIO")
                 )
                 .formLogin(form -> form

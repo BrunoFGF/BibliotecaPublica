@@ -62,7 +62,7 @@ public class Usuario implements UserDetails {
     private Boolean activo = true;
 
     @Column(name = "email_verificado", nullable = false)
-    private Boolean emailVerificado = false;
+    private Boolean emailVerificado = true;
 
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
@@ -78,33 +78,26 @@ public class Usuario implements UserDetails {
     )
     private Set<Rol> roles;
 
-    // Métodos de UserDetails con manejo de errores
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        try {
-            if (roles == null || roles.isEmpty()) {
-                System.out.println("WARNING: Usuario " + email + " no tiene roles asignados");
-                return Collections.emptyList();
-            }
-
-            return roles.stream()
-                    .filter(rol -> rol != null && rol.getNombre() != null)
-                    .map(rol -> {
-                        String authority = "ROLE_" + rol.getNombre();
-                        System.out.println("Creando authority: " + authority);
-                        return new SimpleGrantedAuthority(authority);
-                    })
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            System.out.println("ERROR en getAuthorities(): " + e.getMessage());
-            e.printStackTrace();
+        if (roles == null || roles.isEmpty()) {
             return Collections.emptyList();
         }
+
+        return roles.stream()
+                .filter(rol -> rol != null && rol.getNombre() != null)
+                .map(rol -> new SimpleGrantedAuthority("ROLE_" + rol.getNombre()))
+                .collect(Collectors.toList());
     }
 
     @Override
     public String getUsername() {
         return email;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
     }
 
     @Override
@@ -124,15 +117,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        boolean activoCheck = activo != null ? activo : false;
-        boolean emailCheck = emailVerificado != null ? emailVerificado : false;
-        System.out.println("isEnabled() - activo: " + activoCheck + ", emailVerificado: " + emailCheck);
-        return activoCheck && emailCheck;
-    }
-
-    // Métodos de utilidad con validación null-safe
-    public String getNombreCompleto() {
-        return nombre != null ? nombre : "";
+        return (activo != null ? activo : false) && (emailVerificado != null ? emailVerificado : false);
     }
 
     public boolean tieneRol(String nombreRol) {
@@ -146,10 +131,6 @@ public class Usuario implements UserDetails {
 
     public boolean esBibliotecario() {
         return tieneRol("BIBLIOTECARIO");
-    }
-
-    public boolean esUsuarioRegular() {
-        return tieneRol("USUARIO");
     }
 
     @PrePersist

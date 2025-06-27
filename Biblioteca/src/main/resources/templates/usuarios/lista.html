@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .search-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
             padding: 2rem 0;
             margin-bottom: 2rem;
@@ -33,6 +33,13 @@
             border-radius: 10px;
             margin-top: 1rem;
         }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.2) !important;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -42,23 +49,55 @@
         <a class="navbar-brand" href="/web/libros">
             <i class="fas fa-book"></i> Biblioteca Digital
         </a>
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Menú Principal -->
             <div class="navbar-nav me-auto">
                 <a class="nav-link" href="/web/libros">
                     <i class="fas fa-book-open"></i> Libros
                 </a>
-                <a class="nav-link" href="/web/usuarios">
+                <a class="nav-link active bg-light bg-opacity-20 rounded" href="/web/usuarios">
                     <i class="fas fa-users"></i> Usuarios
                 </a>
             </div>
+
+            <!-- Menú de Usuario -->
             <div class="navbar-nav">
-                <span class="navbar-text me-3" sec:authentication="name"></span>
-                <a class="nav-link" href="/logout">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                </a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle"></i>
+                        <span sec:authentication="name">Usuario</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <h6 class="dropdown-header">
+                                <i class="fas fa-user"></i>
+                                <span sec:authentication="name">Usuario Actual</span>
+                            </h6>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="/web/usuarios">
+                                <i class="fas fa-users"></i> Gestionar Usuarios
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/web/libros">
+                                <i class="fas fa-book-open"></i> Gestionar Libros
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="/logout">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </div>
         </div>
     </div>
@@ -118,12 +157,17 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 
-    <!-- Botón para nuevo usuario -->
+    <!-- Botón para nuevo usuario y navegación rápida -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>Usuarios Registrados</h3>
-        <a href="/web/usuarios/nuevo" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Nuevo Usuario
-        </a>
+        <h3><i class="fas fa-users"></i> Usuarios Registrados</h3>
+        <div>
+            <a href="/web/libros" class="btn btn-outline-primary me-2">
+                <i class="fas fa-book-open"></i> Ver Libros
+            </a>
+            <a href="/web/usuarios/nuevo" class="btn btn-success">
+                <i class="fas fa-plus"></i> Nuevo Usuario
+            </a>
+        </div>
     </div>
 
     <!-- Tabla de Usuarios -->
@@ -197,6 +241,10 @@
                            class="btn btn-warning btn-sm btn-action" title="Editar">
                             <i class="fas fa-edit"></i>
                         </a>
+                        <a th:href="@{/web/usuarios/cambiar-password/{id}(id=${usuario.id})}"
+                           class="btn btn-secondary btn-sm btn-action" title="Cambiar contraseña">
+                            <i class="fas fa-key"></i>
+                        </a>
                         <button type="button" class="btn btn-danger btn-sm btn-action btn-eliminar"
                                 title="Eliminar"
                                 th:data-usuario-id="${usuario.id}"
@@ -206,7 +254,7 @@
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(usuarios.content)}">
-                    <td colspan="5" class="text-center py-4">
+                    <td colspan="6" class="text-center py-4">
                         <i class="fas fa-users fa-3x text-muted mb-3"></i>
                         <h5 class="text-muted">No se encontraron usuarios</h5>
                         <p class="text-muted">Intenta ajustar los filtros de búsqueda</p>
@@ -247,6 +295,12 @@
             </ul>
         </nav>
     </div>
+
+    <!-- Botón flotante para agregar -->
+    <a href="/web/usuarios/nuevo" class="btn btn-success btn-lg position-fixed"
+       style="bottom: 2rem; right: 2rem; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-plus fa-lg"></i>
+    </a>
 </div>
 
 <!-- Modal de confirmación de eliminación -->

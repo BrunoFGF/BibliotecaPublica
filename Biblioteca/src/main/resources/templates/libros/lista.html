@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,19 +35,72 @@
             border-radius: 10px;
             margin-top: 1rem;
         }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body class="bg-light">
-<!-- Header -->
+<!-- Header con Navegación Completa -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
         <a class="navbar-brand" href="/web/libros">
             <i class="fas fa-book"></i> Biblioteca Digital
         </a>
-        <div class="navbar-nav ms-auto">
-            <a class="nav-link" href="/web/libros/nuevo">
-                <i class="fas fa-plus"></i> Nuevo Libro
-            </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Menú Principal -->
+            <div class="navbar-nav me-auto">
+                <a class="nav-link active" href="/web/libros">
+                    <i class="fas fa-book-open"></i> Libros
+                </a>
+                <a class="nav-link" href="/web/usuarios">
+                    <i class="fas fa-users"></i> Usuarios
+                </a>
+            </div>
+
+            <!-- Menú de Usuario -->
+            <div class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle"></i>
+                        <span sec:authentication="name">Usuario</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <h6 class="dropdown-header">
+                                <i class="fas fa-user"></i>
+                                <span sec:authentication="name">Usuario Actual</span>
+                            </h6>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="/web/usuarios">
+                                <i class="fas fa-users"></i> Gestionar Usuarios
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/web/libros">
+                                <i class="fas fa-book-open"></i> Gestionar Libros
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="/logout">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </div>
         </div>
     </div>
 </nav>
@@ -101,6 +154,19 @@
          th:classappend="${tipoMensaje == 'success'} ? 'alert-success' : 'alert-danger'">
         <span th:text="${mensaje}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3><i class="fas fa-book-open"></i> Libros en el Sistema</h3>
+        <div>
+            <a href="/web/usuarios" class="btn btn-outline-primary me-2">
+                <i class="fas fa-users"></i> Ver Usuarios
+            </a>
+            <a href="/web/libros/nuevo" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Libro
+            </a>
+        </div>
     </div>
 
     <!-- Tabla de Libros -->

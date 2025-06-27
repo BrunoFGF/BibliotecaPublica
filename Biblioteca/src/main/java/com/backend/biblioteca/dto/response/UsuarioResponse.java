@@ -25,10 +25,6 @@ public class UsuarioResponse {
     private LocalDateTime fechaActualizacion;
     private Set<RolResponse> roles;
 
-    public String getNombreCompleto() {
-        return nombre;
-    }
-
     public static UsuarioResponse fromEntity(Usuario usuario) {
         UsuarioResponse response = new UsuarioResponse();
         response.setId(usuario.getId());

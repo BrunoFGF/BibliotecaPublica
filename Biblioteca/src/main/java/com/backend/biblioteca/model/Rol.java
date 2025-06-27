@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.Objects;
 
 @Entity
 @Table(name = "roles")
@@ -27,17 +27,21 @@ public class Rol {
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
-    @ManyToMany(mappedBy = "roles")
-    private Set<Usuario> usuarios;
-
     @PrePersist
     protected void onCreate() {
         fechaCreacion = LocalDateTime.now();
     }
 
-    // Constructor de conveniencia
-    public Rol(String nombre, String descripcion) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Rol rol = (Rol) o;
+        return Objects.equals(id, rol.id) && Objects.equals(nombre, rol.nombre);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nombre);
     }
 }

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,7 +28,6 @@ public class UsuarioViewController {
     @Autowired
     private UsuarioService usuarioService;
 
-    // Página principal - Lista de usuarios
     @GetMapping
     public String listarUsuarios(
             @RequestParam(defaultValue = "0") int page,
@@ -61,7 +59,6 @@ public class UsuarioViewController {
         return "usuarios/lista";
     }
 
-    // Formulario para crear usuario
     @GetMapping("/nuevo")
     public String mostrarFormularioCrear(Model model) {
         UsuarioCreateRequest usuario = new UsuarioCreateRequest();
@@ -73,7 +70,6 @@ public class UsuarioViewController {
         return "usuarios/formulario";
     }
 
-    // Crear usuario
     @PostMapping("/crear")
     public String crearUsuario(@Valid @ModelAttribute("usuario") UsuarioCreateRequest usuario,
                                BindingResult result, Model model, RedirectAttributes redirectAttributes) {
@@ -96,7 +92,6 @@ public class UsuarioViewController {
         return "redirect:/web/usuarios";
     }
 
-    // Eliminar usuario
     @PostMapping("/eliminar/{id}")
     public String eliminarUsuario(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
@@ -111,7 +106,6 @@ public class UsuarioViewController {
         return "redirect:/web/usuarios";
     }
 
-    // Ver detalles del usuario
     @GetMapping("/detalle/{id}")
     public String verDetalle(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
@@ -125,14 +119,12 @@ public class UsuarioViewController {
         }
     }
 
-    // Formulario para editar usuario
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
             UsuarioResponse usuario = usuarioService.getUsuarioById(id);
             List<Rol> roles = usuarioService.getAllRoles();
 
-            // Convertir a UsuarioUpdateRequest
             UsuarioUpdateRequest usuarioRequest = new UsuarioUpdateRequest();
             usuarioRequest.setCedula(usuario.getCedula());
             usuarioRequest.setNombre(usuario.getNombre());
@@ -140,7 +132,6 @@ public class UsuarioViewController {
             usuarioRequest.setDireccion(usuario.getDireccion());
             usuarioRequest.setActivo(usuario.getActivo());
 
-            // Obtener IDs de roles
             Set<Long> rolesIds = usuario.getRoles().stream()
                     .map(rol -> rol.getId())
                     .collect(Collectors.toSet());
@@ -159,7 +150,6 @@ public class UsuarioViewController {
         }
     }
 
-    // Actualizar usuario
     @PostMapping("/actualizar/{id}")
     public String actualizarUsuario(@PathVariable Long id,
                                     @Valid @ModelAttribute("usuario") UsuarioUpdateRequest usuario,
@@ -187,7 +177,6 @@ public class UsuarioViewController {
         return "redirect:/web/usuarios";
     }
 
-    // En el controlador
     @GetMapping("/cambiar-password/{id}")
     public String mostrarFormularioCambiarPassword(@PathVariable Long id, Model model) {
         model.addAttribute("usuarioId", id);
@@ -200,7 +189,6 @@ public class UsuarioViewController {
                                   @Valid @ModelAttribute ChangePasswordRequest request,
                                   BindingResult result, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            // manejar errores
             return "usuarios/cambiar-password";
         }
 

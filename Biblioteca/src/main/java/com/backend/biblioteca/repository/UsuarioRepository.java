@@ -14,10 +14,9 @@ import java.util.Optional;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long>, JpaSpecificationExecutor<Usuario> {
 
     Optional<Usuario> findByEmail(String email);
-    Optional<Usuario> findByCedula(String cedula);
 
     boolean existsByEmail(String email);
-    boolean existsByEmailAndIdNot(String email, Long id);
+
     boolean existsByCedula(String cedula);
     boolean existsByCedulaAndIdNot(String cedula, Long id);
 

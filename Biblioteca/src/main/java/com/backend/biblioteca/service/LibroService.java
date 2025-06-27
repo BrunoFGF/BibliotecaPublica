@@ -26,7 +26,6 @@ public class LibroService {
     @Autowired
     private LibroRepository libroRepository;
 
-    // BUSCAR/OBTENER LIBROS CON TODOS LOS FILTROS
     @Transactional(readOnly = true)
     public PaginationResponse<Libro> searchLibros(
             int page, int size, String sortBy, String sortDirection,
@@ -34,12 +33,10 @@ public class LibroService {
             Integer anioPublicacion, Integer cantidadDisponible, Boolean disponible,
             String search) {
 
-        // Configurar paginación y ordenamiento
         Sort.Direction direction = sortDirection.equalsIgnoreCase("DESC")
                 ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        // Crear especificación dinámica
         Specification<Libro> spec = createDynamicSpecification(
                 codigoLibro, titulo, autor, editorial,
                 anioPublicacion, cantidadDisponible, disponible, search
@@ -49,7 +46,6 @@ public class LibroService {
         return PaginationResponse.of(result);
     }
 
-    // CREAR ESPECIFICACIÓN DINÁMICA PARA TODOS LOS FILTROS
     private Specification<Libro> createDynamicSpecification(
             String codigoLibro, String titulo, String autor, String editorial,
             Integer anioPublicacion, Integer cantidadDisponible, Boolean disponible,
@@ -58,7 +54,6 @@ public class LibroService {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // Filtro por código exacto
             if (codigoLibro != null && !codigoLibro.trim().isEmpty()) {
                 predicates.add(criteriaBuilder.equal(
                         criteriaBuilder.upper(root.get("codigoLibro")),
@@ -66,7 +61,6 @@ public class LibroService {
                 ));
             }
 
-            // Filtro por título (parcial)
             if (titulo != null && !titulo.trim().isEmpty()) {
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.upper(root.get("titulo")),
@@ -74,7 +68,6 @@ public class LibroService {
                 ));
             }
 
-            // Filtro por autor (parcial)
             if (autor != null && !autor.trim().isEmpty()) {
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.upper(root.get("autor")),
@@ -82,7 +75,6 @@ public class LibroService {
                 ));
             }
 
-            // Filtro por editorial (parcial)
             if (editorial != null && !editorial.trim().isEmpty()) {
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.upper(root.get("editorial")),
@@ -90,28 +82,24 @@ public class LibroService {
                 ));
             }
 
-            // Filtro por año exacto
             if (anioPublicacion != null) {
                 predicates.add(criteriaBuilder.equal(
                         root.get("anioPublicacion"), anioPublicacion
                 ));
             }
 
-            // Filtro por cantidad mínima disponible
             if (cantidadDisponible != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(
                         root.get("cantidadDisponible"), cantidadDisponible
                 ));
             }
 
-            // Filtro solo libros disponibles (cantidad > 0)
             if (disponible != null && disponible) {
                 predicates.add(criteriaBuilder.greaterThan(
                         root.get("cantidadDisponible"), 0
                 ));
             }
 
-            // Búsqueda general (busca en título, autor, código, editorial)
             if (search != null && !search.trim().isEmpty()) {
                 String searchTerm = "%" + search.toUpperCase() + "%";
 
@@ -129,14 +117,12 @@ public class LibroService {
         };
     }
 
-    // OBTENER LIBRO POR ID
     @Transactional(readOnly = true)
     public Libro getLibroById(Long id) {
         return libroRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Libro", "ID", id));
     }
 
-    // CREAR LIBRO
     public Libro createLibro(LibroCreateRequest request) {
         if (libroRepository.existsByCodigoLibroIgnoreCase(request.getCodigoLibro())) {
             throw new DuplicateResourceException("Libro", "código", request.getCodigoLibro());
@@ -146,7 +132,6 @@ public class LibroService {
         return getLibro(request, libro);
     }
 
-    // ACTUALIZAR LIBRO
     public Libro updateLibro(Long id, LibroCreateRequest request) {
         Libro libro = getLibroById(id);
 
@@ -168,7 +153,6 @@ public class LibroService {
         return libroRepository.save(libro);
     }
 
-    // ELIMINAR LIBRO
     public void deleteLibro(Long id) {
         if (!libroRepository.existsById(id)) {
             throw new ResourceNotFoundException("Libro", "ID", id);

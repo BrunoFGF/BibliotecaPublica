@@ -16,8 +16,4 @@ public class LoginResponse {
     private String email;
     private Set<String> roles;
     private LocalDateTime loginTime;
-
-    public String getNombreCompleto() {
-        return nombre;
-    }
 }
