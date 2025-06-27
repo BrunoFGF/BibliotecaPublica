@@ -105,7 +105,6 @@
 
     <!-- Body -->
     <div class="login-body">
-        <!-- Mensajes de error/éxito -->
         <div th:if="${param.error}" class="alert alert-danger">
             <i class="fas fa-exclamation-circle me-2"></i>
             <strong>Error:</strong> Credenciales inválidas o acceso denegado.
@@ -117,7 +116,6 @@
             Has cerrado sesión exitosamente.
         </div>
 
-        <!-- Formulario de Login -->
         <form th:action="@{/login}" method="post">
             <div class="form-group">
                 <label for="username" class="form-label">
@@ -164,7 +162,6 @@
         </form>
     </div>
 
-    <!-- Footer con información simplificada -->
     <div class="login-footer">
         <h6 class="mb-2">
             <i class="fas fa-info-circle"></i> Credenciales de Acceso
@@ -175,9 +172,6 @@
                 <strong>Email:</strong> admin@biblioteca.com<br>
                 <strong>Contraseña:</strong> admin123
             </p>
-            <small class="text-muted">
-                <i class="fas fa-shield-alt"></i> Sistema simplificado sin encriptación
-            </small>
         </div>
 
         <small class="text-muted">
@@ -193,7 +187,6 @@
         document.getElementById('username').focus();
     });
 
-    // Efecto de hover en el botón
     document.querySelector('.btn-login').addEventListener('mouseenter', function() {
         this.style.transform = 'translateY(-2px)';
     });
@@ -202,7 +195,6 @@
         this.style.transform = 'translateY(0)';
     });
 
-    // Auto-hide mensajes después de 5 segundos
     setTimeout(function() {
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(function(alert) {
